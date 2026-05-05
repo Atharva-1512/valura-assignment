@@ -123,7 +123,7 @@ The server will start on `http://localhost:8000`
 curl http://localhost:8000/health
 ```
 
-## API Usage
+
 
 ### Query Endpoint
 
@@ -195,13 +195,23 @@ Tests use `unittest.mock.patch` to mock the OpenAI LLM, so they can be run in CI
 - **Decision**: Used `gpt-4o-mini` with structured JSON output (Pydantic parsing) in a single call. 
 - **Tradeoff**: Lower latency and cost (under $0.05) vs. a more advanced model (`gpt-4.1`). Structured outputs ensure we reliably get the intent, entities, agent, and safety verdict in one pass without parsing errors.
 
+
+
+
 ### Pipeline Timeout
 - **Decision**: Implemented a 10-second `asyncio.wait_for` timeout around the SSE streaming steps.
 - **Reasoning**: Given the target of p95 < 6s, 10s is a sane buffer for network jitters with the OpenAI API. If the LLM takes longer than 10s, we aggressively cut it off and emit an `error` SSE event to prevent hanging connections.
 
+
+
+
+
 ### Empty Portfolio Handling
 - **Decision**: Instead of failing or throwing an error, the Portfolio Health agent recognizes empty portfolios and pivots strictly to a `BUILD` recommendation format, encouraging the user to set goals and start diversifying.
 
-## Defence Video
 
-[Link to unlisted YouTube video here]
+
+
+
+## Defence Video
+https://youtu.be/oi01tE_VB9E  
