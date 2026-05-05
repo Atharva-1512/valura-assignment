@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Valura AI Demo</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; padding: 2rem; display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #38bdf8; }
+        .container { background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 100%; max-width: 800px; }
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input, textarea { width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #f8fafc; font-family: inherit; margin-bottom: 1rem; }
+        button { background: #0ea5e9; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #0284c7; }
+        pre { background: #000; padding: 1rem; border-radius: 6px; overflow-x: auto; white-space: pre-wrap; font-size: 0.9rem; color: #a7f3d0; min-height: 200px; }
+        .event { margin-bottom: 0.5rem; }
+        .event-type { color: #f472b6; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Valura AI Microservice</h1>
+    <div class="container">
+        <div class="input-group">
+            <label>Query</label>
+            <input type="text" id="query" value="Analyze my portfolio health">
+        </div>
+        <div class="input-group">
+            <label>Portfolio (JSON)</label>
+            <textarea id="portfolio" rows="3">[{"symbol": "AAPL", "shares": 10}, {"symbol": "GOOGL", "shares": 5}]</textarea>
+        </div>
+        <button onclick="runDemo()">Run Demo</button>
+        
+        <h3 style="margin-top: 2rem;">Response Stream:</h3>
+        <pre id="output"></pre>
+    </div>
+
+    <script>
+        async function runDemo() {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Connecting...\\n';
+            
+            const query = document.getElementById('query').value;
+            const portfolio = JSON.parse(document.getElementById('portfolio').value);
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, portfolio })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    output.innerHTML += chunk;
+                }
+            } catch (err) {
+                output.innerHTML += '\\nError: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
