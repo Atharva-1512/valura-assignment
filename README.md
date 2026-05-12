@@ -36,7 +36,17 @@ src/
     └── __init__.py      # Utility functions
 ```
 
+
+
+
+
 ### Design Decisions
+
+#### Safety Guard
+- **Pure Python implementation** - No external dependencies for speed
+- **Deterministic rules** - Consistent blocking behavior
+- **Category-specific messages** - Clear rejection reasons
+- **Fast execution** - <10ms latency### Design Decisions
 
 #### Safety Guard
 - **Pure Python implementation** - No external dependencies for speed
